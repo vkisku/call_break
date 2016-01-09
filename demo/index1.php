@@ -1,23 +1,17 @@
-<?PHP 
-require_once('../_includes/card_play.php');
-$ob=new card_play();
-$deck=$ob->get_cards();
+<?PHP
+require_once('../_includes/include_all.php');
+$players=array("vikash","gulshan","vijay","ajay","player","priyanka");
+//$ob1=new card_play();
+$ob=new teen_patti($players);
 $ob->start();
-$player1=$ob->get_players("player1");
-print_r($ob->get_players());
-//print_r($ob->get_card_by_suit('spades'));
-//echo "</br> -------------------------------------</br>";
-print_r($a1);
-?>
+print_r($ob->cards_of_players());
+ ?>
   <table  border="0" style="width:30%">
   <tr>
     <th>Player</th>
     <th>Cards</th>
   </tr>
   <?PHP
-		$string="Player";
-	$players=array("vikash","gulshan","vijay","ajay","player","heloo");
-
   foreach($players as $value=>$player){?>
   <tr><td><?="Player ".$player;?></td>
   <td></td>
@@ -30,4 +24,3 @@ print_r($a1);
 <?php }}?>
   </tr>
 </table> 
- 

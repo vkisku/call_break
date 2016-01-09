@@ -1,14 +1,14 @@
 <?PHP
 class card_play{
-		private $cards=array();
+		protected $cards=array();
 		//private $black_sparrow=array();
 		//private $spaids=array();
 		//private $diamond=array();
 		//private $hearts=array();
-		private $player=array();
-		private $chunk=13;
+		protected $player=array();//this array contains the arrays of players and their cards
+		protected $chunk=4;
 		
-		private $no_of_players=4;
+		private $no_of_players=6;
 		//private $type_of_game;
 function __construct(){
 		self::cards();
@@ -34,7 +34,7 @@ foreach($suits as $suit ){
 function get_cards(){
 return $this->cards;
 }
-private function divide_to_players($cards,$chunk,$no_of_players){
+protected function divide_to_players($cards,$chunk,$no_of_players){
 $players=array();
 		if(count($cards)!=52)
 		return false;
@@ -48,6 +48,8 @@ $players=array();
 		//$this->player=array("player1"=>$players[0],"player2"=>$players[1],"player3"=>$players[2],"player4"=>$players[3]);
 		for($i=0;$i<$no_of_players;$i++)
 		array_push($this->player,array("player".($i+1)=>$players[$i]));//,array("player2"=>$players[1]),array("player3"=>$players[2]),array("player4"=>$players[3]));
+	//print_r($this->player);
+
 	}
 
 private function shuffle_assoc($array){
@@ -80,11 +82,14 @@ $cards_chunks=array_chunk($this->cards,13,true);
 		else return false;
 	}
 function get_players($player_no=null){
-		if($player_no==null)return false;
-		if($player_no==1 || $player_no=="player1" )return $this->player[0]['player1'];
+		if($player_no==null || $player_no<0 || $player_no>$this->no_of_players)return false;
+			
+			return $this->player[$player_no-1]['player'.$player_no];
+			
+		/* if($player_no==1 || $player_no=="player1" )return $this->player[0]['player1'];
 		if($player_no==2 || $player_no=="player2")return $this->player[1]['player2'];
 		if($player_no==3 || $player_no=="player3")return $this->player[2]['player3'];
-		if($player_no==4 || $player_no=="player4")return $this->player[3]['player4'];
+		if($player_no==4 || $player_no=="player4")return $this->player[3]['player4']; */
 	}
 }
 ?>
