@@ -5,10 +5,7 @@ class call_break{
 		//private $spaids=array();
 		//private $diamond=array();
 		//private $hearts=array();
-		private $player1=array();
-		private $player2=array();
-		private $player3=array();
-		private $player4=array();
+		private $player=array();
 function __construct(){
 		self::cards();
 		//$this->cards=self::add_to_array($this->black_sparrow,$this->spaids,$this->diamond,$this->hearts);
@@ -18,7 +15,7 @@ function start(){
 }
 
 function cards(){
-$suits=array("Hearts","Diamond","Clubs","Spades");
+$suits=array("Hearts","Diamonds","Clubs","Spades");
 $faces=array("Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King","Ace");
 $values=array(1,2,3,4,5,6,7,8,9,10,11,12,13);
 
@@ -33,19 +30,20 @@ foreach($suits as $suit ){
 function get_cards(){
 return $this->cards;
 }
-function divide_to_players($cards){
+private function divide_to_players($cards){
 $players=array();
 		if(count($cards)!=52)
 		return false;
-			$players=array(array());
 		$players=array_chunk($cards,13,true);
 		$this->player1=$players[0];
 		$this->player2=$players[1];
 		$this->player3=$players[2];
 		$this->player4=$players[3];
+		//$this->player=array("player1"=>$this->player1);
+		$this->player=array("player1"=>$players[0],"player2"=>$players[1],"player3"=>$players[2],"player4"=>$players[3]);
 }
 
-function shuffle_assoc($array){
+private function shuffle_assoc($array){
        $shuffled_array = array();
 
     // Get array's keys and shuffle them.
@@ -62,46 +60,24 @@ function shuffle_assoc($array){
     // Return
         return $shuffled_array;
 	}
-function get_card($option=null){
+function get_card_by_suit($option=null){
+$cards_chunks=array_chunk($this->cards,13,true);
 		if($option==null){
-			return  $this->hearts+$this->diamond+$this->spaids+$this->black_sparrow;
+			return  $cards_chunks[0]+$cards_chunks[1]+$cards_chunks[2]+$cards_chunks[3];
 			
 		}
-		else if($option=="H" || $option=="h")return $this->hearts;
-		else if($option=="D" || $option=="d")return $this->diamond;
-		else if($option=="S" || $option=="s")return $this->spaids;
-		else if($option=="B" || $option=="b")return $this->black_sparrow;
+		else if(strtolower($option)=="h"||strtolower($option)=="hearts")return $cards_chunks[0];
+		else if(strtolower($option)=="d"||strtolower($option)=="diamond")return $cards_chunks[1];
+		else if(strtolower($option)=="c"||strtolower($option)=="clubs")return $cards_chunks[2];
+		else if(strtolower($option)=="s"||strtolower($option)=="spades")return $cards_chunks[3];
 		else return false;
 	}
 function get_players($player_no=null){
 		if($player_no==null)return false;
-		if($player_no==1)return $this->player1;
-		if($player_no==2)return $this->player2;
-		if($player_no==3)return $this->player3;
-		if($player_no==4)return $this->player4;
+		if($player_no==1 || $player_no=="player1" )return $this->player['player1'];
+		if($player_no==2 || $player_no=="player2")return $this->player['player2'];
+		if($player_no==3 || $player_no=="player3")return $this->player['player3'];
+		if($player_no==4 || $player_no=="player4")return $this->player['player4'];
 	}
 }
-$ob=new call_break();
-$deck=$ob->get_cards();
-$ob->start();
-$player=$ob->get_players(2);
-
-//$ob->start();
-//;
- //$ob->start();
 ?>
-  <table  border="2" style="width:30%">
-  <tr>
-    <th>Card</th>
-    <th>Type</th>
-    <th>Value</th>
-  </tr>
-  <?PHP
-		foreach($deck as $cards){
-  ?>
-  <tr>
-    &nbsp;<td><?=$cards['face'];?></td>
-    <td><?=$cards['suit'];?></td>
-    <td><?=$cards['value'];}?></td>
-  </tr>
-</table> 
