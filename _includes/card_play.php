@@ -6,14 +6,16 @@ class card_play{
 		//private $diamond=array();
 		//private $hearts=array();
 		private $player=array();
-		//private $no_of_players;
+		private $chunk=13;
+		
+		private $no_of_players=4;
 		//private $type_of_game;
 function __construct(){
 		self::cards();
 		//$this->cards=self::add_to_array($this->black_sparrow,$this->spaids,$this->diamond,$this->hearts);
 }
 function start(){
-		self::divide_to_players(self::shuffle_assoc($this->cards),4);
+		self::divide_to_players(self::shuffle_assoc($this->cards),$this->chunk,$this->no_of_players);
 }
 
 function cards(){
@@ -32,18 +34,21 @@ foreach($suits as $suit ){
 function get_cards(){
 return $this->cards;
 }
-private function divide_to_players($cards,$no_of_players){
+private function divide_to_players($cards,$chunk,$no_of_players){
 $players=array();
 		if(count($cards)!=52)
 		return false;
-		$players=array_chunk($cards,52/$no_of_players,true);
-		$this->player1=$players[0];
+		$players=array_chunk($cards,$chunk,true);
+		/* $this->player1=$players[0];
 		$this->player2=$players[1];
 		$this->player3=$players[2];
-		$this->player4=$players[3];
+		$this->player4=$players[3]; */
+		
 		//$this->player=array("player1"=>$this->player1);
-		$this->player=array("player1"=>$players[0],"player2"=>$players[1],"player3"=>$players[2],"player4"=>$players[3]);
-}
+		//$this->player=array("player1"=>$players[0],"player2"=>$players[1],"player3"=>$players[2],"player4"=>$players[3]);
+		for($i=0;$i<$no_of_players;$i++)
+		array_push($this->player,array("player".($i+1)=>$players[$i]));//,array("player2"=>$players[1]),array("player3"=>$players[2]),array("player4"=>$players[3]));
+	}
 
 private function shuffle_assoc($array){
        $shuffled_array = array();
@@ -76,10 +81,10 @@ $cards_chunks=array_chunk($this->cards,13,true);
 	}
 function get_players($player_no=null){
 		if($player_no==null)return false;
-		if($player_no==1 || $player_no=="player1" )return $this->player['player1'];
-		if($player_no==2 || $player_no=="player2")return $this->player['player2'];
-		if($player_no==3 || $player_no=="player3")return $this->player['player3'];
-		if($player_no==4 || $player_no=="player4")return $this->player['player4'];
+		if($player_no==1 || $player_no=="player1" )return $this->player[0]['player1'];
+		if($player_no==2 || $player_no=="player2")return $this->player[1]['player2'];
+		if($player_no==3 || $player_no=="player3")return $this->player[2]['player3'];
+		if($player_no==4 || $player_no=="player4")return $this->player[3]['player4'];
 	}
 }
 ?>
