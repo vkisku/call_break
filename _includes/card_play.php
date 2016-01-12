@@ -1,6 +1,7 @@
 <?PHP
 class card_play{
 		protected $cards=array();
+		protected $shuffled_cards=array();
 		//private $black_sparrow=array();
 		//private $spaids=array();
 		//private $diamond=array();
@@ -15,9 +16,16 @@ function __construct(){
 		//$this->cards=self::add_to_array($this->black_sparrow,$this->spaids,$this->diamond,$this->hearts);
 }
 function start(){
-		self::divide_to_players(self::shuffle_assoc($this->cards),$this->chunk,$this->no_of_players);
+		self::shuffle();
+		self::divide_to_players($this->shuffled_cards,$this->chunk,$this->no_of_players);
 }
+protected function  shuffle(){
+		$this->shuffled_cards=self::shuffle_assoc($this->cards);
+}
+function get_shuffled_cards(){
+		return $this->shuffled_cards;
 
+}
 function cards(){
 $suits=array("Hearts","Diamonds","Clubs","Spades");
 $faces=array("Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King","Ace");
