@@ -1,5 +1,5 @@
 .*
 !.gitignore
-sandbox
+/sandbox
 sandbox/*.*
 /images
