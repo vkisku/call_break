@@ -1,2 +1,5 @@
+.*
+!.gitignore
+sandbox
+sandbox/*.*
 /images
-/demo/sandbox/*
