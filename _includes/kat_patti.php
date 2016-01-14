@@ -1,7 +1,7 @@
 <?PHP 
 
 class kat_patti extends card_play{
-			private $no_of_players;
+			protected $no_of_players;
 			protected $players=array();
 			protected $random_card;
 			private $game_id;
@@ -40,7 +40,8 @@ class kat_patti extends card_play{
 	}
 function put_shuffled_cards_to_database($game_id){
 
-}	
+}
+	
 	
 	}
 

@@ -1,7 +1,7 @@
 <?PHP 
 
 class teen_patti extends card_play{
-			private $no_of_players;
+			//private $no_of_players;
 			private $no_of_cards=3;
 			protected $players=array();
 	function __construct($players){
@@ -15,7 +15,10 @@ class teen_patti extends card_play{
 	return $this->players;
 	}
 	function cards_of_players(){
-	print_r($this->player);
+	 $keys=array_keys($this->player);
+	 print_r($this->player);
+	
+	 
 	}
 	function get_rank_by_card($player_name){
 	print_r($card=$this->player[$player_name]['player'.($player_name+1)]);

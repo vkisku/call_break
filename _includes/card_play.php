@@ -9,7 +9,7 @@ class card_play{
 		protected $player=array();//this array contains the arrays of players and their cards
 		protected $chunk=4;
 		
-		private $no_of_players=6;
+		protected $no_of_players;
 		//private $type_of_game;
 function __construct(){
 		self::cards();
