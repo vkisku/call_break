@@ -12,13 +12,10 @@ class card_play{
 		protected $no_of_players;
 		//private $type_of_game;
 function __construct(){
-		self::cards();
+		//self::cards();
 		//$this->cards=self::add_to_array($this->black_sparrow,$this->spaids,$this->diamond,$this->hearts);
 }
-function start(){
-		self::shuffle();
-		self::divide_to_players($this->shuffled_cards,$this->chunk,$this->no_of_players);
-}
+
 protected function  shuffle(){
 		$this->shuffled_cards=self::shuffle_assoc($this->cards);
 }
@@ -26,7 +23,7 @@ function get_shuffled_cards(){
 		return $this->shuffled_cards;
 
 }
-function cards(){
+protected function cards(){
 $suits=array("Hearts","Diamonds","Clubs","Spades");
 $faces=array("Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King","Ace");
 $values=array(1,2,3,4,5,6,7,8,9,10,11,12,13);
@@ -46,7 +43,7 @@ protected function divide_to_players($cards,$chunk,$no_of_players){
 $players=array();
 		if(count($cards)!=52)
 		return false;
-		$players=array_chunk($cards,$chunk,true);
+		$players=array_chunk($cards,$chunk,false);
 		/* $this->player1=$players[0];
 		$this->player2=$players[1];
 		$this->player3=$players[2];
@@ -55,7 +52,7 @@ $players=array();
 		//$this->player=array("player1"=>$this->player1);
 		//$this->player=array("player1"=>$players[0],"player2"=>$players[1],"player3"=>$players[2],"player4"=>$players[3]);
 		for($i=0;$i<$no_of_players;$i++)
-		array_push($this->player,array("player".($i+1)=>$players[$i]));//,array("player2"=>$players[1]),array("player3"=>$players[2]),array("player4"=>$players[3]));
+		array_push($this->player,$players[$i]);//,array("player2"=>$players[1]),array("player3"=>$players[2]),array("player4"=>$players[3]));
 	//print_r($this->player);
 
 	}
