@@ -85,19 +85,19 @@ class teen_patti extends card_play{
 	
 	}
 	function get_cards_by_game_id(){
-		$temp=array();
-		$table1=$this->table_name[0];
-		$table2=$this->table_name[1];
-		$game_id=self::get_game_id();
-		$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id";
-		$result = mysqli_query($this->connection, $sql);
+			$temp=array();
+			$table1=$this->table_name[0];
+			$table2=$this->table_name[1];
+			$game_id=self::get_game_id();
+			$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id";
+			$result = mysqli_query($this->connection, $sql);
 
 		if (mysqli_num_rows($result) > 0) {
 			// output data of each row
 			while($row = mysqli_fetch_assoc($result)) {
 				
-			  array_push($temp,array($row['card1'],$row['card2'],$row['card3']));//pushing
-			
+			  array_push($temp,array($row['card1'],$row['card2'],$row['card3']));
+			  
 			}
 		}
 			
