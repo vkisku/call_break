@@ -96,7 +96,7 @@ class teen_patti extends card_play{
 			// output data of each row
 			while($row = mysqli_fetch_assoc($result)) {
 				
-			  array_push($temp,array($row['card1'],$row['card2'],$row['card3']));
+			  array_push($temp,array($row['card1'],$row['card2'],$row['card3']));//pushing
 			
 			}
 		}
