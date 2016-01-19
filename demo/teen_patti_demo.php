@@ -10,7 +10,7 @@ $players=array("vikash","kisku","vijay");
  echo "game_id".$ob->get_game_id();
  //$ob->cards_of_players();
  //print_r($ob->get_players());
-
+$ob->get_cards_by_game_id();
   /* $array=array(array(
  array('face'=>'Two','value'=>2,'suit'=>'Clubs'),//8 9 10   8 10 9  9 8 10 9 10 8 // 10 8 9 // 10 9 8
  array('face'=>'Five','value'=>4,'suit'=>'Clubs'),
@@ -25,17 +25,12 @@ $players=array("vikash","kisku","vijay");
  print_r($array);
  $winner=$ob->get_winner($array)); */
  // print_r($ob->get_winner());
- $cards=$ob->cards_of_players();
+ $cards=$ob->get_cards_by_game_id();
 $players=$ob->get_players();
 $winner=$ob->set_rank();
  
-//print_r($cards);
-foreach($cards as $key=>$card){
-foreach($card as $keys=>$try){
-echo $try['suit'];
-}
-echo "</br>";
-}
+print_r($cards);
+
 
   ?>
    <table  border="0" style="width:30%">
@@ -57,7 +52,7 @@ echo "</br>";
 		foreach($cards[$value] as $key=>$card){
 		
   ?>
-	<td><img src="../images/SVG/<?=$card['value']."_of_".strtolower($card['suit']).".svg";?>" alt="Mountain View" style="width:90px;height:80px;"></td>
+	<td><img src="../images/SVG/<?=strtolower($card).".svg";?>" alt="Mountain View" style="width:90px;height:80px;"></td>
 	<?php   }
 	
 			}		?>
