@@ -57,7 +57,7 @@ $status=$ob->get_status();
     <th>Cards</th>
   </tr>
   <?PHP
-	$ob->get_right_of_the_player();
+	$ob->queue(102);
   foreach($players as $value=>$player){?>
   <tr><td><?="Player ".$player;  echo " value=".$winner[$value];?></td>
   <td></td>

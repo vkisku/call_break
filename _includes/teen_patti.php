@@ -1,5 +1,11 @@
 <?PHP 
+/*
+Status 0=Card just distributed and  the game is yet to start not visible to any user
+Status 1=Put to Blind that means user does not want to see its cards yet
+Status 2=Seen and hence user can see his cards and bid for the same
+Status 3=Packed the cards mean he does not want to play this particular game
 
+*/
 class teen_patti extends card_play{
 			//private $no_of_players;
 			private $no_of_cards=3;
@@ -100,12 +106,15 @@ class teen_patti extends card_play{
 		self::set_players();
 	return $this->users;
 	}
-	function get_right_of_the_player(){
+	function get_left_or_right($user_id=null){
+			//$user_id=($user_id==null)?
 			$users=self::get_players();
-			$user_id=104;//session
 			$key=array_search($user_id,$users);
-			 $this->right_left=$users[(($key=array_search($user_id,$users))==0)?count($users)-1:$key-1];
+			 $this->right_player=$users[(($key=array_search($user_id,$users))==0)?count($users)-1:$key-1];
 			 $this->right_player=$users[(($key=array_search($user_id,$users))==count($users)-1)?0:$key+1];
+			 $direction['right']=$this->right_player;
+			 $direction['left']=$this->right_player;
+			 return $direction;
 	}
 	function cards_of_players(){
 	 //$keys=array_keys($this->player);
@@ -150,6 +159,7 @@ class teen_patti extends card_play{
 		
 		return $status;
 	}
+	
 	function action($action=null){
 	if($action=='blind')self::blind();
 	else if($action=='seen')self::seen();
@@ -159,6 +169,7 @@ class teen_patti extends card_play{
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
 		$user_id=111;//sesson id
+		
 		$sql="update $table set status=1 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
 	}
@@ -166,6 +177,7 @@ class teen_patti extends card_play{
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
 		$user_id=111;//session_id
+		
 		$sql="update $table set status=2 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
 	}
@@ -174,6 +186,7 @@ class teen_patti extends card_play{
 		$game_id=self::get_game_id();
 		$user_id1=111;//session id
 		$user_id2=112;//id on click to  on the left
+		
 		$sql="update $table set status=3,seen_id=$user_id2 where game_id=$game_id and user_id=$user_id1";
 		mysqli_query($this->connection, $sql);
 	}
@@ -184,6 +197,20 @@ class teen_patti extends card_play{
 		
 		$sql="update $table set status=4 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
+	}
+	function queue($user_id){
+		$users=self::get_players();
+		//print_r($users);
+		$table=$this->table_name[2];
+		$game_id=self::get_game_id();
+		//$user_id=111;//sesson id
+		$direction=self::get_left_or_right($user_id);
+		$id=$direction['right'];
+		
+		$sql1="update $table set queue_status=0 where game_session_id=$game_id and user_id=$user_id";
+		$sql2="update $table set queue_status=1 where game_session_id=$game_id and user_id=$id";
+		mysqli_query($this->connection, $sql1);
+		mysqli_query($this->connection, $sql2);
 	}
 	function get_cards_by_game_id($user_id=null){
 			$temp=array();
