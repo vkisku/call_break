@@ -44,9 +44,12 @@ class teen_patti extends card_play{
 		$table=$this->table_name[2];
 		$game_id=self::get_game_id();
 		$player=$this->players;
+		$next_player=self::get_left_or_right($this->user_id)['right'];
 			for($i=0;$i<$this->no_of_players;$i++){
-				$sql="insert into $table(user_id,game_session_id,status)values('$player[$i]','$game_id','1') ";// 1=game active  0=game complete;
-				mysqli_query($this->connection,$sql);
+				$sql1="insert into $table(user_id,game_session_id,status)values('$player[$i]','$game_id','1') ";// 1=game active  0=game complete;
+				$sql2="update $table set status_queue=1 where game_session_id=$game_id and user_id=$next_player ";
+				mysqli_query($this->connection,$sql1);
+				mysqli_query($this->connection,$sql2);
 			}
 		
 		
@@ -121,11 +124,27 @@ class teen_patti extends card_play{
 	 return $this->player;
 	 
 	}
+	function show(){
+	$winner=array();
+	$table1=$this->table_name[0];
+	$table2=$this->table_name[1];
+	$table3=$this->table_name[2];
+	$game_id=self::get_game_id();
+	$sql="select * from $table2 where game_id=$game_id and status<3";
+	$result=mysqli_query($this->connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$winner[$row['value']]=$row['user_id'];
+	
+	}
+	$keys=array_keys($winner);
+	if(count($winner)==1)return $winner[max($keys)];
+	if(count($winner)==2)return $winner[max($keys)];
+	}
 	function get_rank($user_id=null){
 		$rank=array();
-		$table1=$this->table_name[0];
-		$table2=$this->table_name[1];
-		$game_id=self::get_game_id();
+		$table1=$this->table_name[0];//game
+		$table2=$this->table_name[1];//teen_patti
+		$game_id=self::get_game_id();//game_session
 		$replace_string=($user_id!=null)?"and user_id=$user_id":"";
 		$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
 		$result=mysqli_query($this->connection, $sql);
@@ -147,12 +166,12 @@ class teen_patti extends card_play{
 		$table3=$this->table_name[2];
 		$game_id=self::get_game_id();
 		$replace_string=($user_id!=null)?"and user_id=$user_id":"";
-		$sql="select * from $table1,$table2,$table3 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
+		$sql="select distinct $table2.user_id,$table3.queue_status,$table2.status from $table2,$table3 where $table2.game_id=$table3.game_session_id and 
+				   $table2.game_id=$game_id $replace_string group by $table2.id";
 		$result=mysqli_query($this->connection, $sql);
 		if (mysqli_num_rows($result) > 0) {
 			// output data of each row
 			while($row = mysqli_fetch_assoc($result)) {
-				
 			  $status['status'][$row['user_id']]=$row['status'];
 			  $status['queue_status'][$row['user_id']]=$row['queue_status'];
 			}
@@ -161,9 +180,9 @@ class teen_patti extends card_play{
 		return $status;
 	}
 	
-	function action($action=null){
+	function action($action=null,$user_id){
 	if($action=='blind')self::blind();
-	else if($action=='seen')self::seen();
+	else if($action=='seen')self::seen($user_id);
 	else if($action=='side_seen')self::side_seen();
 	}
 	private function blind(){
@@ -174,11 +193,11 @@ class teen_patti extends card_play{
 		$sql="update $table set status=1 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
 	}
-	private function seen(){
+	private function seen($user_id){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
-		$user_id=111;//session_id
-		
+		//$user_id=111;//session_id
+	
 		$sql="update $table set status=2 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
 	}

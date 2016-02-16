@@ -1,4 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("a#seen").click(function(){
+        var txt ="seen";
+        $.post("ajax_example.php", {action: txt}, function(result){
+            $("span").html(result);
+        });
+    });
+});
+$(document).ready(function(){
+    $("button#blind1").click(function(){
+        alert("hello");
+        $.post("ajax_example.php", {suggest: txt}, function(result){
+            $("span").html(result);
+        });
+    });
+});
+</script>
+</head>
+<body>
 <?PHP
+$id=101;
 session_start();
 require_once('../_includes/include_all.php');
 $con=mysqli_connect("localhost","vikash","kisku","play_cards");
@@ -11,75 +36,55 @@ if(!isset($_SESSION['game_id'])){
  <?PHP 
  if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $players_name=explode(" ",$_POST['players']);
-$ob=new teen_patti($con);
+$ob=new teen_patti($con,$id);
  $ob->start($players_name);
 }
  }
  else {
  ?>
 <?PHP
-
-//$players=array("110","111","112");
- //$ob=new teen_patti($players,$con);
- //$ob->start();
- //$ob->card_distribute();
- //$ob->set_game_id();
- //$ob->action('blind');
- echo "game_id".$ob->get_game_id();
- //$ob->cards_of_players();
- //print_r($ob->get_players());
-//$ob->get_cards_by_game_id();
-//$ob->set_session_to_database();
-  /* $array=array(array(
- array('face'=>'Two','value'=>2,'suit'=>'Clubs'),//8 9 10   8 10 9  9 8 10 9 10 8 // 10 8 9 // 10 9 8
- array('face'=>'Five','value'=>4,'suit'=>'Clubs'),
- array('face'=>'Ace','value'=>14,'suit'=>'Clubs')
- ),
- array(
- array('face'=>'Nine','value'=>13,'suit'=>'Hearts'),
- array('face'=>'Ten','value'=>12,'suit'=>'Hearts'),  
- array('face'=>'Seven','value'=>10,'suit'=>'Hearts')  
- )
- ); 
- print_r($array);
- $winner=$ob->get_winner($array)); */
- $id=100;
- $con=mysqli_connect("localhost","vikash","kisku","play_cards");
+ //$con=mysqli_connect("localhost","vikash","kisku","play_cards");
  $ob=new teen_patti($con);
  $winner=$ob->get_rank();
  $players=$ob->get_players();
  $cards=$ob->get_cards_by_game_id();
 $status=$ob->get_status();
+print_r($ob->show());
   ?>
-   <table  border="0" style="width:30%">
+   <span><table  border="0" style="width:30%">
   <tr>
     <th>Player</th>
     <th>Cards</th>
   </tr>
   <?PHP
-  $user_id=103;
+  $user_id=101;
 	//$ob->queue(102);
 	$st=$ob->get_status();
 	$status=$st['status'];
 	$status1=$st['queue_status'];
-	print_r($status);
-  foreach($players as $value=>$player){
-											
-	?>
-  <tr><td><?="Player ".$player;  echo " value=".$winner[$value];?></td>
-  <?PHP if($user_id==$player) {?><td>action</td><?PHP if($status1[$player]==1){?><td>do_the_action</td>
-			<?PHP }}else { ?><td>daction</td><?php } ?>
-  <?PHP
-	//foreach(1)
-		//foreach($cards as $cards){ 		
-		foreach($cards[$value] as $key=>$card){
+	//print_r($status);
+  foreach($players as $value=>$player){	?>
+	<tr>
+		<td><?="Player ".$player;  echo " value=".$winner[$value];?></td>
+  <?PHP if($user_id==$player){ ?>
+		<td>action</td>
+  <?PHP 	if($status1[$player]==1){ ?>
+		<td >
 		
+		<a href="" id="seen" value="see">See</button></td>
+  <?PHP 	}
+		}else
+			{ ?>
+		<td>daction</td>
+  <?php	 } ?>
+  <?PHP	
+		foreach($cards[$value] as $key=>$card){
   ?>
-	<td><img src="../images/SVG/<?=($status[$player]==0 ||$status[$player]==1)?"card.png":strtolower($card).".svg";?>" alt="Mountain View" style="width:90px;height:80px;"></td>
-	<?php   }  
+		<td><img src="../images/SVG/<?=($status[$player]==0 )?"card.png":strtolower($card).".svg";?>" alt="Mountain View" style="width:90px;height:80px;"></td>
+  <?php  }  
 	
-			}		?>
+	}	?>
   </tr>
-</table> 
+</table></span> 
  <?PHP }?>
  
