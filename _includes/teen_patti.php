@@ -9,26 +9,42 @@ class teen_patti extends card_play{
 			private $blind_rate=1;
 			private $seen_rate=2;
 			private $connection;
+			private $user_id;
+			private $users=array();
 			private $rank=array();
-			private $table_name=array("game","teen_patti");
-	function __construct($players,$con=null,$board_rate=null,$blind_rate=null,$seen_rate=null){
+			private $right_player;
+			private $left_player;
+			private $table_name=array("game","teen_patti","game_session");
+	function __construct($con=null,$user_id=null){
 	$this->connection=$con;
-	$this->players=$players;
-	$this->no_of_players=count($players);
-		$this->chunk=$this->no_of_cards;
-			self::cards();
+	$this->user_id=$user_id;
+	$this->chunk=$this->no_of_cards;		
+	}
+	function start($players){
+		$this->players=$players;
+		$this->no_of_players=count($players);
+		self::cards();
 			//self::set_board_rate($board_rate);
 			//self::set_blind_rate($blind_rate);
 			//self::set_seen_rate($seen_rate);
 			self::shuffle();
 		self::divide_to_players($this->shuffled_cards,$this->chunk,$this->no_of_players);
-			
-	}
-	function start(){
 		self::set_game_id();
 		self::set_rank();
 		self::card_distribute();
+		self::set_session_to_database();
 }
+	private function set_session_to_database(){
+		$table=$this->table_name[2];
+		$game_id=self::get_game_id();
+		$player=$this->players;
+			for($i=0;$i<$this->no_of_players;$i++){
+				$sql="insert into $table(user_id,game_session_id,status)values('$player[$i]','$game_id','1') ";// 1=game active  0=game complete;
+				mysqli_query($this->connection,$sql);
+			}
+		
+		
+	}
 	private function card_distribute(){
 		$table=$this->table_name[1];
 		$n=$this->no_of_players;
@@ -63,33 +79,120 @@ class teen_patti extends card_play{
 	return $this->game_id;
 	
 	}
+	
+	function set_players(){
+	$players=array();
+	$game_id=self::get_game_id();
+	$table=$this->table_name[1];
+	$sql="select * from $table where game_id=$game_id";
+	$result=mysqli_query($this->connection,$sql);
+		if (mysqli_num_rows($result) > 0) {
+			// output data of each row
+			while($row=mysqli_fetch_assoc($result)) {
+			  $players[]=$row['user_id'];
+			  
+			}
+		}
+			
+	$this->users=$players;
+	}
 	function get_players(){
-	return $this->players;
+		self::set_players();
+	return $this->users;
+	}
+	function get_right_of_the_player(){
+			$users=self::get_players();
+			$user_id=104;//session
+			$key=array_search($user_id,$users);
+			 $this->right_left=$users[(($key=array_search($user_id,$users))==0)?count($users)-1:$key-1];
+			 $this->right_player=$users[(($key=array_search($user_id,$users))==count($users)-1)?0:$key+1];
 	}
 	function cards_of_players(){
 	 //$keys=array_keys($this->player);
 	 return $this->player;
 	 
 	}
-	function get_rank_by_card($player_name){
-	print_r($card=$this->player[$player_name]['player'.($player_name+1)]);
-	
-	$keys=array_keys($card);
-	 $card1=$card[$keys[0]]['face']."_of_".$card[$keys[0]]['suit'];
-	 $card2=$card[$keys[1]]['face']."_of_".$card[$keys[1]]['suit'];
-	 $card3=$card[$keys[2]]['face']."_of_".$card[$keys[2]]['suit'];
-	echo $sql="select * from cards_play where
-			 card1 in('$card1','$card2','$card3') and
-			 card2 in('$card1','$card2','$card3') and
-			 card3 in('$card1','$card2','$card3')";
-	
+	function get_rank($user_id=null){
+		$rank=array();
+		$table1=$this->table_name[0];
+		$table2=$this->table_name[1];
+		$game_id=self::get_game_id();
+		$replace_string=($user_id!=null)?"and user_id=$user_id":"";
+		$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
+		$result=mysqli_query($this->connection, $sql);
+		if (mysqli_num_rows($result) > 0) {
+			// output data of each row
+			while($row = mysqli_fetch_assoc($result)) {
+				
+			  $rank[]=$row['value'];
+			  
+			}
+		}
+		
+		return $rank;
 	}
-	function get_cards_by_game_id(){
+	function get_status($user_id=null){
+		$status=array();
+		$table1=$this->table_name[0];
+		$table2=$this->table_name[1];
+		$game_id=self::get_game_id();
+		$replace_string=($user_id!=null)?"and user_id=$user_id":"";
+		$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
+		$result=mysqli_query($this->connection, $sql);
+		if (mysqli_num_rows($result) > 0) {
+			// output data of each row
+			while($row = mysqli_fetch_assoc($result)) {
+				
+			  $status[]=$row['status'];
+			  
+			}
+		}
+		
+		return $status;
+	}
+	function action($action=null){
+	if($action=='blind')self::blind();
+	else if($action=='seen')self::seen();
+	else if($action=='side_seen')self::side_seen();
+	}
+	private function blind(){
+		$table=$this->table_name[1];
+		$game_id=self::get_game_id();
+		$user_id=111;//sesson id
+		$sql="update $table set status=1 where game_id=$game_id and user_id=$user_id";
+		mysqli_query($this->connection, $sql);
+	}
+	private function seen(){
+		$table=$this->table_name[1];
+		$game_id=self::get_game_id();
+		$user_id=111;//session_id
+		$sql="update $table set status=2 where game_id=$game_id and user_id=$user_id";
+		mysqli_query($this->connection, $sql);
+	}
+	private function side_seen(){
+		$table=$this->table_name[1];
+		$game_id=self::get_game_id();
+		$user_id1=111;//session id
+		$user_id2=112;//id on click to  on the left
+		$sql="update $table set status=3,seen_id=$user_id2 where game_id=$game_id and user_id=$user_id1";
+		mysqli_query($this->connection, $sql);
+	}
+	private function pack(){
+		$table=$this->table_name[1];
+		$game_id=self::get_game_id();
+		$user_id=111;//sesson id
+		
+		$sql="update $table set status=4 where game_id=$game_id and user_id=$user_id";
+		mysqli_query($this->connection, $sql);
+	}
+	function get_cards_by_game_id($user_id=null){
 			$temp=array();
 			$table1=$this->table_name[0];
 			$table2=$this->table_name[1];
 			$game_id=self::get_game_id();
-			$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id";
+			$replace_string=($user_id!=null)?"and user_id=$user_id":"";
+
+			$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
 			$result = mysqli_query($this->connection, $sql);
 
 		if (mysqli_num_rows($result) > 0) {
