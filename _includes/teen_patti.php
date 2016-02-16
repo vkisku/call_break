@@ -144,16 +144,17 @@ class teen_patti extends card_play{
 		$status=array();
 		$table1=$this->table_name[0];
 		$table2=$this->table_name[1];
+		$table3=$this->table_name[2];
 		$game_id=self::get_game_id();
 		$replace_string=($user_id!=null)?"and user_id=$user_id":"";
-		$sql="select * from $table1,$table2 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
+		$sql="select * from $table1,$table2,$table3 where $table1.game_id=$table2.game_id and $table1.game_id=$game_id $replace_string";
 		$result=mysqli_query($this->connection, $sql);
 		if (mysqli_num_rows($result) > 0) {
 			// output data of each row
 			while($row = mysqli_fetch_assoc($result)) {
 				
-			  $status[]=$row['status'];
-			  
+			  $status['status'][$row['user_id']]=$row['status'];
+			  $status['queue_status'][$row['user_id']]=$row['queue_status'];
 			}
 		}
 		

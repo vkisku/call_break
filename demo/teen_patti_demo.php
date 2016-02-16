@@ -57,18 +57,26 @@ $status=$ob->get_status();
     <th>Cards</th>
   </tr>
   <?PHP
-	$ob->queue(102);
-  foreach($players as $value=>$player){?>
+  $user_id=103;
+	//$ob->queue(102);
+	$st=$ob->get_status();
+	$status=$st['status'];
+	$status1=$st['queue_status'];
+	print_r($status);
+  foreach($players as $value=>$player){
+											
+	?>
   <tr><td><?="Player ".$player;  echo " value=".$winner[$value];?></td>
-  <td></td>
+  <?PHP if($user_id==$player) {?><td>action</td><?PHP if($status1[$player]==1){?><td>do_the_action</td>
+			<?PHP }}else { ?><td>daction</td><?php } ?>
   <?PHP
 	//foreach(1)
 		//foreach($cards as $cards){ 		
 		foreach($cards[$value] as $key=>$card){
 		
   ?>
-	<td><img src="../images/SVG/<?=($player==$id)?strtolower($card).".svg":"card.png";?>" alt="Mountain View" style="width:90px;height:80px;"></td>
-	<?php   }
+	<td><img src="../images/SVG/<?=($status[$player]==0 ||$status[$player]==1)?"card.png":strtolower($card).".svg";?>" alt="Mountain View" style="width:90px;height:80px;"></td>
+	<?php   }  
 	
 			}		?>
   </tr>
