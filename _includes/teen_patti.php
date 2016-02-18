@@ -152,7 +152,7 @@ class teen_patti extends card_play{
 			// output data of each row
 			while($row = mysqli_fetch_assoc($result)) {
 				
-			  $rank[]=$row['value'];
+			  $rank[$row['user_id']]=$row['value'];
 			  
 			}
 		}
@@ -165,9 +165,9 @@ class teen_patti extends card_play{
 		$table2=$this->table_name[1];
 		$table3=$this->table_name[2];
 		$game_id=self::get_game_id();
-		$replace_string=($user_id!=null)?"and user_id=$user_id":"";
+		$replace_string=($user_id!=null)?"and $table2.user_id=$user_id":"";
 		$sql="select distinct $table2.user_id,$table3.queue_status,$table2.status from $table2,$table3 where $table2.game_id=$table3.game_session_id and 
-				   $table2.game_id=$game_id $replace_string group by $table2.id";
+				   $table2.user_id=$table3.user_id and $table2.game_id=$game_id $replace_string group by $table2.id";
 		$result=mysqli_query($this->connection, $sql);
 		if (mysqli_num_rows($result) > 0) {
 			// output data of each row
@@ -180,15 +180,16 @@ class teen_patti extends card_play{
 		return $status;
 	}
 	
-	function action($action=null,$user_id){
-	if($action=='blind')self::blind();
-	else if($action=='seen')self::seen($user_id);
-	else if($action=='side_seen')self::side_seen();
+	function action($action=null,$user_id1,$user_id2=null){
+	if($action=='blind')self::blind($user_id1);
+	else if($action=='seen')self::seen($user_id1);
+	else if($action=='side_seen')self::side_seen($user_id1,$user_id2);
+	else if($action=='pack')self::pack($user_id1);
 	}
-	private function blind(){
+	private function blind($user_id){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
-		$user_id=111;//sesson id
+		//$user_id=111;//sesson id
 		
 		$sql="update $table set status=1 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
@@ -201,19 +202,19 @@ class teen_patti extends card_play{
 		$sql="update $table set status=2 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
 	}
-	private function side_seen(){
+	private function side_seen($user_id1,$user_id2){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
-		$user_id1=111;//session id
-		$user_id2=112;//id on click to  on the left
+		//$user_id1=111;//session id
+		//$user_id2=112;//id on click to  on the left
 		
 		$sql="update $table set status=3,seen_id=$user_id2 where game_id=$game_id and user_id=$user_id1";
 		mysqli_query($this->connection, $sql);
 	}
-	private function pack(){
+	private function pack($user_id){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
-		$user_id=111;//sesson id
+		//$user_id=111;//sesson id
 		
 		$sql="update $table set status=4 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
@@ -246,7 +247,7 @@ class teen_patti extends card_play{
 			// output data of each row
 			while($row = mysqli_fetch_assoc($result)) {
 				
-			  array_push($temp,array($row['card1'],$row['card2'],$row['card3']));
+			  $temp[$row['user_id']]=array($row['card1'],$row['card2'],$row['card3']);
 			  
 			}
 		}
@@ -273,33 +274,39 @@ class teen_patti extends card_play{
 		 if($array[$i][0]['face']==$array[$i][1]['face'] && $array[$i][1]['face']==$array[$i][2]['face']){  // condition of trio
 		 
 				$ans[$i]=10000+$array[$i][0]['value'];   
-			}//   2 14 3
-		 else if(($array[$i][0]['value']+1==$array[$i][1]['value'] && $array[$i][1]['value']+1==$array[$i][2]['value'])||  // condition for Run
-				 $array[$i][2]['value']+1==$array[$i][1]['value'] && $array[$i][1]['value']+1==$array[$i][0]['value']||    
-				 $array[$i][0]['value']+1==$array[$i][2]['value'] && $array[$i][2]['value']+1==$array[$i][1]['value']||
-				 $array[$i][1]['value']+1==$array[$i][0]['value'] && $array[$i][0]['value']+1==$array[$i][2]['value']||
-				 $array[$i][2]['value']+1==$array[$i][0]['value'] && $array[$i][0]['value']+1==$array[$i][1]['value']||
-				 $array[$i][1]['value']+1==$array[$i][2]['value'] && $array[$i][2]['value']+1==$array[$i][0]['value']||
-				 $array[$i][0]['value']+1==$array[$i][1]['value'] && $array[$i][2]['value']-13+1==$array[$i][0]['value']||
-				 $array[$i][1]['value']+1==$array[$i][2]['value'] && $array[$i][0]['value']-13+1==$array[$i][1]['value']||
-				 $array[$i][0]['value']+1==$array[$i][2]['value'] && $array[$i][1]['value']-13+1==$array[$i][1]['value']){
-			if($array[$i][0]['suit']==$array[$i][1]['suit']  && $array[$i][1]['suit']==$array[$i][2]['suit'])  // Straight    Extrs condition for 14 2 3 where 14 is Ace because Ace is the Highest and also 1
+			}
+		 else if(($array[$i][0]['value']+1==$array[$i][1]['value'] && $array[$i][1]['value']+1==$array[$i][2]['value'])  || // Condition for Run
+				  $array[$i][2]['value']+1==$array[$i][1]['value'] && $array[$i][1]['value']+1==$array[$i][0]['value']   ||    
+				  $array[$i][0]['value']+1==$array[$i][2]['value'] && $array[$i][2]['value']+1==$array[$i][1]['value']   ||
+				  $array[$i][1]['value']+1==$array[$i][0]['value'] && $array[$i][0]['value']+1==$array[$i][2]['value']   ||
+				  $array[$i][2]['value']+1==$array[$i][0]['value'] && $array[$i][0]['value']+1==$array[$i][1]['value']   ||
+				  $array[$i][1]['value']+1==$array[$i][2]['value'] && $array[$i][2]['value']+1==$array[$i][0]['value']   ||
+				  $array[$i][0]['value']+1==$array[$i][1]['value'] && $array[$i][2]['value']-13+1==$array[$i][0]['value']||
+				  $array[$i][1]['value']+1==$array[$i][2]['value'] && $array[$i][0]['value']-13+1==$array[$i][1]['value']||
+				  $array[$i][0]['value']+1==$array[$i][2]['value'] && $array[$i][1]['value']-13+1==$array[$i][1]['value']){
+				  
+				   // Straight    Extra condition for 14 2 3 where 14 is Ace because Ace is the Highest and also 1
+			if($array[$i][0]['suit']==$array[$i][1]['suit']  && $array[$i][1]['suit']==$array[$i][2]['suit']) 
+				
 				$ans[$i]=$ans[$i]=9000+($max=max($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']))-$x=($max==14)?((min($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value'])==2)?1:0):0;
-			else 
-				$ans[$i]=8000+($max=max($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']))-$x=($max==14)?((min($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value'])==2)?1:0):0; //Normal
+				
+			else     ////Normal Condition
+				$ans[$i]=8000+($max=max($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']))-$x=($max==14)?((min($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value'])==2)?1:0):0; 
 			}
 		 else if($array[$i][0]['suit']==$array[$i][1]['suit']  && $array[$i][1]['suit']==$array[$i][2]['suit']){ 
-				// Color 
+				// Condition for Color 
+				
 				$max=max($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']);
 				$min=min($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']);
 				$total=$array[$i][0]['value']+$array[$i][1]['value']+$array[$i][2]['value'];
+				
 				$ans[$i]=6000+($max)*100+($total-($max+$min))*10+$min;   //(max($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']));
 			}
-		 else if($array[$i][0]['face']==$array[$i][1]['face'] && $array[$i][0]['face']!=$array[$i][2]['face'] ||  // Double
+		 else if($array[$i][0]['face']==$array[$i][1]['face'] && $array[$i][0]['face']!=$array[$i][2]['face'] ||  // Condtion for Double
 				 $array[$i][0]['face']==$array[$i][2]['face'] && $array[$i][0]['face']!=$array[$i][1]['face']||
 				 $array[$i][1]['face']==$array[$i][2]['face'] && $array[$i][2]['face']!=$array[$i][0]['face']){
-																												// 223 232 322
-				 $ans[$i]=5000+$array[$i][0]['value']+$array[$i][1]['value']+$array[$i][2]['value']; //776  778
+																												
+				 $ans[$i]=5000+$array[$i][0]['value']+$array[$i][1]['value']+$array[$i][2]['value']; 
 			}
 		 else {
 				$max=max($array[$i][0]['value'],$array[$i][1]['value'],$array[$i][2]['value']);
@@ -312,6 +319,32 @@ class teen_patti extends card_play{
 		}
 		$this->rank=$ans;
 	}
-
+	public static function game_end(){
+	//session_start();
+		if(isset($_SESSION['game_id']))
+			unset($_SESSION['game_id']);
+	}
+	function Accept_game_request($user_id){
+	//$table1=$this->table_name[0];
+	//$table2=$this->table_name[1];
+	$table3=$this->table_name[2];
+	
+	$sql="select * from $table3 where user_id=$user_id and status=1 ORDER BY id DESC LIMIT 1";
+	$result=mysqli_query($this->connection,$sql);
+	$row=mysqli_fetch_array($result);
+	$game_id=$row['game_session_id'];
+	$_SESSION['game_id']=$game_id;
+	}
+	public static function Redirect($redirect_to){
+		if (!empty($_SERVER['HTTPS']) && ('on' == $_SERVER['HTTPS'])) {
+		$uri = 'https://';
+	} else {
+		$uri = 'http://';
+	}
+	$uri .= $_SERVER['HTTP_HOST'];
+	//header('Location: '.$uri.'/xampp/');
+	header('Location: '.$redirect_to);
+	exit;
+	}
 }
 ?>
