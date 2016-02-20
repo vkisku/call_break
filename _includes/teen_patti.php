@@ -39,6 +39,7 @@ class teen_patti extends card_play{
 		self::set_rank();
 		self::card_distribute();
 		self::set_session_to_database();
+		self::queue($this->user_id);
 }
 	private function set_session_to_database(){
 		$table=$this->table_name[2];
@@ -89,11 +90,12 @@ class teen_patti extends card_play{
 	
 	}
 	
-	function set_players(){
+	function set_players($rule=null){
 	$players=array();
 	$game_id=self::get_game_id();
 	$table=$this->table_name[1];
-	$sql="select * from $table where game_id=$game_id";
+	$replace_string=($rule!=null)?"and $rule":"";
+	$sql="select * from $table where game_id=$game_id $replace_string";
 	$result=mysqli_query($this->connection,$sql);
 		if (mysqli_num_rows($result) > 0) {
 			// output data of each row
@@ -105,18 +107,19 @@ class teen_patti extends card_play{
 			
 	$this->users=$players;
 	}
-	function get_players(){
-		self::set_players();
+	function get_players($rule=null){
+		self::set_players($rule);
 	return $this->users;
 	}
 	function get_left_or_right($user_id=null){
 			//$user_id=($user_id==null)?
-			$users=self::get_players();
+			$users=self::get_players("status<4");
+			//print_r($users);
 			$key=array_search($user_id,$users);
-			 $this->right_player=$users[(($key=array_search($user_id,$users))==0)?count($users)-1:$key-1];
+			 $this->left_player=$users[(($key=array_search($user_id,$users))==0)?count($users)-1:$key-1];
 			 $this->right_player=$users[(($key=array_search($user_id,$users))==count($users)-1)?0:$key+1];
 			 $direction['right']=$this->right_player;
-			 $direction['left']=$this->right_player;
+			 $direction['left']=$this->left_player;
 			 return $direction;
 	}
 	function cards_of_players(){
@@ -190,34 +193,45 @@ class teen_patti extends card_play{
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
 		//$user_id=111;//sesson id
-		
+		$status=self::get_status($user_id)['status'][$user_id];
+		if($status<1){
 		$sql="update $table set status=1 where game_id=$game_id and user_id=$user_id";
-		mysqli_query($this->connection, $sql);
+		mysqli_query($this->connection, $sql);}
+		self::queue($user_id);
 	}
 	private function seen($user_id){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
 		//$user_id=111;//session_id
-	
+		$status=self::get_status($user_id)['status'][$user_id];
+		if($status<2){
 		$sql="update $table set status=2 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
+		}
+		self::queue($user_id);
 	}
 	private function side_seen($user_id1,$user_id2){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
 		//$user_id1=111;//session id
 		//$user_id2=112;//id on click to  on the left
-		
+		$status=self::get_status($user_id)['status'][$user_id];
+		if($status<3){
 		$sql="update $table set status=3,seen_id=$user_id2 where game_id=$game_id and user_id=$user_id1";
 		mysqli_query($this->connection, $sql);
+		}
+		self::queue($user_id);
 	}
 	private function pack($user_id){
 		$table=$this->table_name[1];
 		$game_id=self::get_game_id();
 		//$user_id=111;//sesson id
-		
+		$status=self::get_status($user_id)['status'][$user_id];
+		if($status<4){
 		$sql="update $table set status=4 where game_id=$game_id and user_id=$user_id";
 		mysqli_query($this->connection, $sql);
+		}
+		self::queue($user_id);
 	}
 	function queue($user_id){
 		$users=self::get_players();
@@ -228,7 +242,7 @@ class teen_patti extends card_play{
 		$direction=self::get_left_or_right($user_id);
 		$id=$direction['right'];
 		
-		$sql1="update $table set queue_status=0 where game_session_id=$game_id and user_id=$user_id";
+		$sql1="update $table set queue_status=0 where game_session_id=$game_id ";
 		$sql2="update $table set queue_status=1 where game_session_id=$game_id and user_id=$id";
 		mysqli_query($this->connection, $sql1);
 		mysqli_query($this->connection, $sql2);

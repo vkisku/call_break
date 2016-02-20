@@ -39,4 +39,28 @@ $( '#quit' ).on( 'click', function( event )({
         //alert("hello");
         });
 });
- </script>
+
+$(document).ready(function(){
+    $("button#quit").click(function(){
+	bootbox.confirm("Are you sure?", function(result) {
+  Example.show("Confirm result: "+result);
+  alert("j");
+	});
+        alert("hello");
+        });
+});
+
+$(document).ready(function(){
+    $("button").click(function(){
+        var txt=this.id;
+		//alert(txt);
+		
+        $.post("ajax_example.php", {action: txt}, function(result){
+						var url = 'teen_patti_demo.php'; //please insert the url of the your current page here, we are assuming the url is 'index.php'         
+                        $('#container').load(url + ' #container'); //note: the space before #div1 is very important
+			                     $("d").html(result);
+			   
+
+        });
+    });
+});

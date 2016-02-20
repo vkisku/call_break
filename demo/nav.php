@@ -35,8 +35,7 @@
 }#nav1 {
     line-height:70%;
     height:30%;
-	background-color:black;
-    width:25%;
+	 width:25%;
     float:right;
     padding:5px;
 }
@@ -95,50 +94,48 @@ if(!isset($_SESSION['game_id'])){
 		
 
 	 ?>
-		<div id="nav">  
-			<span id="container" class="container">
-				<table  border="0" style="width:30%">  
-<?php
+		 
+<?php	$align=0;
 		foreach($players as $player){ 
-			if($player!=$id){  ?>
-					<tr  class="thumbnail " id=<?=($status1[$player]==1)?"ur_chance":""; ?> >
-						<td class="active" ><?="Player ".$player;  echo " value=".$winner[$player];?></td>
+			if($player!=$id){ $align++;  ?>
+					
   <?php 		if($user_id==$player){ ?>
-						<td  >action</td>
   <?php 			if($status1[$player]==1){ ?>
 		
-						<td ><a href="" id="seen" value="see">See</button></td>
+						
   <?PHP 			}
 				}
 				else{ 	?>
-						<td>daction</td>
+						
   <?php	 		} ?>
-  <?php	
+				<div id="nav">
+				<table  border="0" style="width:30%">
+				<tr  class="thumbnail " id=<?=($status1[$player]==1)?"ur_chance":""; ?> >
+				
+							<!--<td class="active" ><?="Player ".$player;  echo " value=".$winner[$player];?></td>-->
+							<!--<td ><a href="" id="seen" value="see">See</button></td>-->
+  <?php				
 				foreach($cards[$player] as $card){ ?>
-						<td class="active" >
-							<img src="../images/SVG/<?=($status[$player]==0 )?"card.png":strtolower($card).".svg";?>" class="img-rfesponsive thumbnail" alt="Mountain View" style="width:80px;height:100px;">
-						</td>
-  <?php 		}  
+					  
+						<span id="container" class="container">
+							<td class="active" >
+								<img src="../images/SVG/<?=($status[$player]==0 )?"card.png":strtolower($card).".svg";?>" class="img-rfesponsive thumbnail" alt="Mountain View" style="width:80px;height:100px;">
+							</td>
+
+					
+		
+						
+  <?php 		} ?></tr>	
+				</table>
+			</span>
+					</div>
+  <?php  
 	
 			}
 		}	?>
   
-					</tr>	
-				</table>
-			</span>
-		</div>
 		
-  <div id="nav1">
-<h1>London</h1>
-<p>
-London is the capital city of England. It is the most populous city in the United Kingdom,
-with a metropolitan area of over 13 million inhabitants.
-</p>
-<p>
-Standing on the River Thames, London has been a major settlement for two millennia,
-its history going back to its founding by the Romans, who named it Londinium.
-</p>
-</div>
+  
   <div id="section">
   
   <table>

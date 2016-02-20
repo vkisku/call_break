@@ -1,0 +1,39 @@
+
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#ur_chance {
+    background-color:hsla(190, 66%, 51%, 0.9);
+	
+}
+#nav {
+    line-height:70%;
+    height:30%;
+	<!--background-color:black;-->
+    width:25%;
+    float:left;
+    padding:5px;
+}#nav1 {
+    line-height:70%;
+    height:30%;
+	background-color:black;
+    width:25%;
+    float:right;
+    padding:5px;
+}
+#section {
+    width:350px;
+	 height:30%;
+    float:left;
+    padding:10px;
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+    padding:5px;
+}
